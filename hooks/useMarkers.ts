@@ -1,8 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useState } from "react";
 
-const STORAGE_KEY = "image_annotator_markers";
-
 export interface Marker {
   id: string;
   x: number;
@@ -11,27 +9,32 @@ export interface Marker {
   pending?: boolean;
 }
 
-export function useMarkers() {
+export function useMarkers(photoId: string) {
+  const storageKey = `markers_${photoId}`;
   const [markers, setMarkers] = useState<Marker[]>([]);
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
+    setMarkers([]);
+    AsyncStorage.getItem(storageKey).then((raw) => {
       if (raw) {
         try {
           setMarkers(JSON.parse(raw));
         } catch {
-          AsyncStorage.removeItem(STORAGE_KEY);
+          AsyncStorage.removeItem(storageKey);
         }
       }
     });
-  }, []);
+  }, [storageKey]);
 
-  const persist = useCallback((next: Marker[]) => {
-    AsyncStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(next.filter((m) => !m.pending)),
-    );
-  }, []);
+  const persist = useCallback(
+    (next: Marker[]) => {
+      AsyncStorage.setItem(
+        storageKey,
+        JSON.stringify(next.filter((m) => !m.pending)),
+      );
+    },
+    [storageKey],
+  );
 
   const addMarker = useCallback(
     (id: string, x: number, y: number, pending = false) => {

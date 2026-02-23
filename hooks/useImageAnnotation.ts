@@ -29,6 +29,7 @@ function resolveSize(
 
 export function useImageAnnotator(
   source: AnnotatorSource,
+  photoId: string,
   propWidth?: number,
   propHeight?: number,
 ) {
@@ -37,7 +38,7 @@ export function useImageAnnotator(
     addMarker,
     confirmMarker: confirmMarkerInStore,
     removeMarker,
-  } = useMarkers();
+  } = useMarkers(photoId);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const { width: screenWidth } = useWindowDimensions();
 
